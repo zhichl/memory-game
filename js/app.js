@@ -41,14 +41,19 @@ function startGame() {
 	resetMatchStack();
 	resetOpenStack();
 	resetMoveCounter();
+	renderMoves();
 	resetStarCounter();
+	renderStars();
 
 	// dynamically create card HTML
-	createCardsHTML(cards);
+	renderCards();
+
 }
 
 function endGame() {
 	// TODO: delete HTML and display winning status
+	// deleteCardsHTML();
+	
 }
 
 /**
@@ -94,6 +99,12 @@ function shuffle(array) {
 	return array;
 }
 
+function renderCards() {
+	deleteCardsHTML();
+	createCardsHTML(cards);
+	addRestartListener();
+}
+
 function createCardsHTML(cards) {
 	const $deck = $(".deck");
 	for (let card of cards) {
@@ -110,6 +121,17 @@ function createCardsHTML(cards) {
 		$card.append($cardIcon);
 		$deck.append($card);
 	}
+}
+
+function deleteCardsHTML() {
+	$(".deck").empty();
+}
+
+function addRestartListener() {
+	$(".restart").on("click", () => {
+		endGame();
+		startGame();
+	});
 }
 
 function setIconAttr($element, attr) {
@@ -130,8 +152,8 @@ function addCardListener($element) {
 		// check match and do something
 		let match = checkMatch(openStack);
 		handleMatch(openStack, match);
-		updateMoveCounter();
-		updatestarCounter();
+		renderMoves(match);
+		renderStars();
 	});
 }
 
@@ -189,13 +211,23 @@ function handleMatch(openStack, match) {
 		}, 300);
 	}
 	// (further work) if cards are incompletely matched(match === Match.INCOMPLETE_MATCH), do something
-	
+
 	updateStacks(match);
+}
+
+// TODO: render stars
+function renderStars() {
+	updatestarCounter();
 }
 
 function updatestarCounter() {
 	starCounter -= Math.floor(moveCounter / CARD_ICONS.length);
 	starCounter = Math.max(0, starCounter);
+}
+
+function renderMoves(match) {
+	updateMoveCounter(match);
+	$(".moves").text(moveCounter);
 }
 
 function updateMoveCounter(match) {
