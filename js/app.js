@@ -1,6 +1,7 @@
 const MATCH_NUMBER = 2;
 const CARD_ICONS = ["fa-anchor", "fa-bolt", "fa-leaf", "fa-diamond", "fa-bomb", "fa-bicycle", "fa-paper-plane-o", "fa-cube"];
 const CARD_NUMBER = MATCH_NUMBER * CARD_ICONS.length;
+const STAR_NUMBER = 3;
 const log = console.log.bind(console);
 
 class Card {
@@ -25,25 +26,25 @@ const Match = {
 
 Object.freeze(Match);
 
-// list holding all cards
+// init game
 let cards = initCards(CARD_ICONS, MATCH_NUMBER),
-	clickStack = [],
+	openStack = [],
 	matchStack = [],
 	moveCounter = 0,
-	stars = 3;
+	starCounter = STAR_NUMBER;
 
 startGame();
 
 function startGame() {
-	// TODO: uncomment shuffle process
-	// cards = shuffle(cards);
-	clickStack = [];
-	matchStack = [];
-	moveCounter = 0;
-	stars = 3;
-	// TODO: dynamically create card HTML
-	createCardsHTML(cards);
+	// TODO: (for testing) uncomment shuffle process
+	shuffleCards();
+	resetMatchStack();
+	resetOpenStack();
+	resetMoveCounter();
+	resetStarCounter();
 
+	// dynamically create card HTML
+	createCardsHTML(cards);
 }
 
 function endGame() {
@@ -96,7 +97,7 @@ function shuffle(array) {
 function createCardsHTML(cards) {
 	const $deck = $(".deck");
 	for (let card of cards) {
-		const $cardLi = $("<li>", {
+		const $card = $("<li>", {
 				"class": "card"
 			}),
 			$cardIcon = $("<i>", {
@@ -104,10 +105,10 @@ function createCardsHTML(cards) {
 			});
 
 		setIconAttr($cardIcon, card.faClasses);
-		addCardListener($cardLi);
+		addCardListener($card);
 
-		$cardLi.append($cardIcon);
-		$deck.append($cardLi);
+		$card.append($cardIcon);
+		$deck.append($card);
 	}
 }
 
@@ -123,17 +124,14 @@ function addCardListener($element) {
 		// get corresponding card index
 		let cardIndex = $(this).index();
 
-		// add to click stack
-		clickStack.push(cards[cardIndex]);
+		// add to open stack
+		openStack.push(cards[cardIndex]);
 
-		// if there're more than one card in the stack, check match and do something
-		if (clickStack.length > 1) {
-			let match = checkMatch(clickStack);
-			handleMatch(clickStack, match);
-			updateMoveCounter();
-			updateStars();
-		}
-
+		// check match and do something
+		let match = checkMatch(openStack);
+		handleMatch(openStack, match);
+		updateMoveCounter();
+		updatestarCounter();
 	});
 }
 
@@ -157,15 +155,15 @@ function checkMatch(cards) {
 	return match;
 }
 
-function handleMatch(clickStack, match) {
-	while (clickStack.length > 0) {
-		const card = clickStack.pop();
-		const index = card.index;
+function handleMatch(openStack, match) {
 
-		// if cards are completely matched, 
-		if (match === Match.COMPLETE_MATCH) {
-			matchStack.push(card);
-			$(".card").eq(index).addClass("match");
+	let $cards = getNodeListFromCards(openStack);
+
+	// if cards are completely matched, 
+	if (match === Match.COMPLETE_MATCH) {
+		for (let $card of $cards) {
+			// $cardIcon = $card.children().first();
+			$card.addClass("match");
 
 			//TODO: do something animating with matched card li
 
@@ -175,37 +173,86 @@ function handleMatch(clickStack, match) {
 				//TODO: do something if won
 			}
 
-			// if cards are not matched
-		} else if (match === Match.NOT_MATCH) {
-
-			//TODO: do something with failing match(change background) 
-			//      AND card li(hide icon)
-
-			moveCounter++;
-			// clear clickStack
-			clickStack = [];
-
 		}
-		// (further work) if cards are incompletely matched(match === Match.INCOMPLETE_MATCH), do something
 
-
-
+		// if cards are not matched
+	} else if (match === Match.NOT_MATCH) {
+		//TODO: do something with failing match(change card color(background)) 
+		//      AND card li(hide icon)
+		for (let $card of $cards) {
+			$card.addClass("match-fail");
+		}
+		setTimeout(() => {
+			for (let $card of $cards) {
+				$card.removeClass("open show match-fail");
+			}
+		}, 300);
 	}
-
-
-
-
-
+	// (further work) if cards are incompletely matched(match === Match.INCOMPLETE_MATCH), do something
+	
+	updateStacks(match);
 }
 
-function updateStars() {
-	stars -= Math.floor(moveCounter / 8);
-	stars = Math.max(0, stars);
+function updatestarCounter() {
+	starCounter -= Math.floor(moveCounter / CARD_ICONS.length);
+	starCounter = Math.max(0, starCounter);
 }
 
 function updateMoveCounter(match) {
 	if (match === Match.COMPLETE_MATCH || match === Match.NOT_MATCH) {
 		moveCounter++;
+	}
+}
+
+function shuffleCards() {
+	cards = shuffle(cards);
+}
+
+function resetMatchStack() {
+	matchStack = [];
+}
+
+function resetOpenStack() {
+	openStack = [];
+}
+
+function resetMoveCounter() {
+	moveCounter = 0;
+}
+
+function resetStarCounter() {
+	starCounter = STAR_NUMBER;
+}
+
+function getNodeListFromCards(cards) {
+	let $cards = [];
+	for (let card of cards) {
+		let $card = getNodeFromCard(card);
+		$cards.push($card);
+	}
+	return $cards;
+}
+
+function getNodeFromCard(card) {
+	return $(".card").eq(card.index);
+}
+
+function updateStacks(match) {
+	updateMatchStack(match);
+	updateOpenStack(match);
+}
+
+function updateOpenStack(match) {
+	if (match === Match.COMPLETE_MATCH || match === Match.NOT_MATCH) {
+		resetOpenStack();
+	}
+}
+
+function updateMatchStack(match) {
+	if (match === Match.COMPLETE_MATCH) {
+		for (let card of openStack) {
+			matchStack.push(card);
+		}
 	}
 }
 
