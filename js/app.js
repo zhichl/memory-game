@@ -52,7 +52,7 @@ function initGame() {
 
 function startGame() {
 	// TODO: (for testing) uncomment shuffle process
-	// shuffleCards();
+	shuffleCards();
 	resetMatchStack();
 	resetOpenStack();
 	resetMoveCounter();
