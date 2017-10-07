@@ -39,15 +39,15 @@ startGame();
 
 function initGame() {
 	cards = initCards(CARD_ICONS, MATCH_NUMBER),
-	openStack = [],
-	matchStack = [],
-	moveCounter = 0,
-	starCounter = STAR_NUMBER;
+		openStack = [],
+		matchStack = [],
+		moveCounter = 0,
+		starCounter = STAR_NUMBER;
 	addRestartButtonListener($(".restart"));
 	addPlayAgainButtonListener($(".play-again"));
 
 	// hide ending modal
-	
+
 }
 
 function startGame() {
@@ -95,10 +95,10 @@ function updateStatsText() {
 	let starText = "stars",
 		moveText = "moves";
 	if (moveCounter < 2 || starCounter < 2) {
-		if(moveCounter < 2) {
+		if (moveCounter < 2) {
 			moveText = "move";
 		}
-		if(starCounter < 2) {
+		if (starCounter < 2) {
 			starText = "star";
 		}
 	}
@@ -201,15 +201,18 @@ function addCardListener($element) {
 
 		// get corresponding card index
 		let cardIndex = $(this).index();
+		let lastCard = openStack[openStack.length - 1];
 
-		// add to open stack
-		openStack.push(cards[cardIndex]);
-
-		// check match and do something
-		let match = checkMatch(openStack);
-		renderMoves(match);
-		renderStars();
-		handleMatch(openStack, match);
+		// skip actions if the same card is being clicked continuously more than once
+		if (!(lastCard && cardIndex === lastCard.index)) {
+			// add to open stack
+			openStack.push(cards[cardIndex]);
+			// check match and update
+			let match = checkMatch(openStack);
+			renderMoves(match);
+			renderStars();
+			handleMatch(openStack, match);
+		}
 	});
 }
 
