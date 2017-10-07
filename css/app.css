@@ -35,6 +35,10 @@ h1 {
 }
 
 
+.game-board{
+    display: none;
+}
+
 /*
  * Styles for the deck of cards
  */
@@ -113,4 +117,45 @@ h1 {
 .score-panel .restart {
     float: right;
     cursor: pointer;
+}
+
+
+/*
+ * Styles for the winning page
+ */
+
+.ending-modal {
+    display: none;
+    color: rgb(107, 107, 107);
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    text-align: center;
+}
+
+.congrats-msg {
+    margin-bottom: 1.5em;
+}
+
+.congrats-msg h1 {
+    font-weight: 800;
+    margin-bottom: 0.5em;
+}
+
+button.play-again {
+    width: 150px;
+    height: 40px;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #30c58c;
+    border: none;
+    cursor: pointer;
+}
+
+button:active {
+    background-color: #1f6d4f;
+}
+
+button:focus {
+    outline: none;
 }
