@@ -27,17 +27,32 @@ const Match = {
 Object.freeze(Match);
 
 // init game
-let cards = initCards(CARD_ICONS, MATCH_NUMBER),
+let cards = [],
+	openStack = [],
+	matchStack = [],
+	moveCounter = 0,
+	starCounter = 0;
+
+
+initGame();
+startGame();
+
+function initGame() {
+	cards = initCards(CARD_ICONS, MATCH_NUMBER),
 	openStack = [],
 	matchStack = [],
 	moveCounter = 0,
 	starCounter = STAR_NUMBER;
+	addRestartButtonListener($(".restart"));
+	addPlayAgainButtonListener($(".play-again"));
 
-startGame();
+	// hide ending modal
+	
+}
 
 function startGame() {
 	// TODO: (for testing) uncomment shuffle process
-	shuffleCards();
+	// shuffleCards();
 	resetMatchStack();
 	resetOpenStack();
 	resetMoveCounter();
@@ -47,13 +62,54 @@ function startGame() {
 
 	// dynamically create card HTML
 	renderCards();
-
+	hideEndingModal();
+	displayGameBoard();
 }
 
 function endGame() {
-	// TODO: delete HTML and display winning status
-	// deleteCardsHTML();
-	
+	updateStatsText();
+	setTimeout(() => {
+		hideGameBoard();
+		displayEndingModal();
+	}, 500);
+}
+
+function displayGameBoard() {
+	$(".game-board").css("display", "flex");
+}
+
+function hideGameBoard() {
+	$(".game-board").css("display", "none");
+}
+
+function displayEndingModal() {
+	$(".ending-modal").css("display", "flex");
+}
+
+function hideEndingModal() {
+	$(".ending-modal").css("display", "none");
+}
+
+function updateStatsText() {
+	// statistics
+	let starText = "stars",
+		moveText = "moves";
+	if (moveCounter < 2 || starCounter < 2) {
+		if(moveCounter < 2) {
+			moveText = "move";
+		}
+		if(starCounter < 2) {
+			starText = "star";
+		}
+	}
+	let statsText = `With ${moveCounter} ${moveText} and ${starCounter} ${starText}`;
+	$(".stats").text(statsText);
+}
+
+function addPlayAgainButtonListener($button) {
+	$button.on("click", () => {
+		startGame();
+	});
 }
 
 /**
@@ -99,10 +155,11 @@ function shuffle(array) {
 	return array;
 }
 
+// TODO: add a cards html updating method and modify renderCards method
+
 function renderCards() {
 	deleteCardsHTML();
 	createCardsHTML(cards);
-	addRestartListener();
 }
 
 function createCardsHTML(cards) {
@@ -127,9 +184,8 @@ function deleteCardsHTML() {
 	$(".deck").empty();
 }
 
-function addRestartListener() {
-	$(".restart").on("click", () => {
-		endGame();
+function addRestartButtonListener($button) {
+	$button.on("click", () => {
 		startGame();
 	});
 }
@@ -151,9 +207,9 @@ function addCardListener($element) {
 
 		// check match and do something
 		let match = checkMatch(openStack);
-		handleMatch(openStack, match);
 		renderMoves(match);
 		renderStars();
+		handleMatch(openStack, match);
 	});
 }
 
@@ -188,19 +244,12 @@ function handleMatch(openStack, match) {
 			$card.addClass("match");
 
 			//TODO: do something animating with matched card li
-
-			// check win
-			let won = checkWin();
-			if (won) {
-				//TODO: do something if won
-			}
-
 		}
 
 		// if cards are not matched
 	} else if (match === Match.NOT_MATCH) {
-		//TODO: do something with failing match(change card color(background)) 
-		//      AND card li(hide icon)
+		//TODO: do something animating with failing match
+
 		for (let $card of $cards) {
 			$card.addClass("match-fail");
 		}
@@ -210,9 +259,17 @@ function handleMatch(openStack, match) {
 			}
 		}, 300);
 	}
-	// (further work) if cards are incompletely matched(match === Match.INCOMPLETE_MATCH), do something
+	// TODO: (further work) if cards are incompletely matched(match === Match.INCOMPLETE_MATCH), do something
 
+	// check win
 	updateStacks(match);
+	let won = checkWin();
+	if (won) {
+		log(`moves before ending game: ${moveCounter}`);
+		endGame();
+	}
+	// log("matchStack length: " + matchStack.length);
+	// log(won);
 }
 
 // TODO: render stars
