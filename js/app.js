@@ -315,28 +315,19 @@ function handleMatch(openStack, match) {
 function renderStars() {
 	updatestarCounter();
 	// if(starCounter < STAR_NUMBER) {
-	// 	$(".score-panel .stars .fa-star").eq(starCounter).css("display", "none");
-	// 	$(".score-panel .stars .fa-star-o").eq(starCounter).css("display", "inline-block");
+	// 	let $star = $(".score-panel .stars .fa").eq(starCounter);
+	// 	if($star.hasClass("fa-star")) {
+	// 		$star.removeClass("fa-star").addClass("fa-star-o");
+	// 	}
+	// // full stars
 	// } else {
-	// 	$(".score-panel .stars .fa-star").css("display", "inline-block");
-	// 	$(".score-panel .stars .fa-star-o").css("display", "none");
+	// 	let $stars = $(".score-panel .stars .fa");
+	// 	$stars.removeClass("fa-star-o").addClass("fa-star");
 	// }
-
-	//starCounter are less then STAR_NUMBER
-	if(starCounter < STAR_NUMBER) {
-		let $star = $(".score-panel .stars .fa").eq(starCounter);
-		if($star.hasClass("fa-star")) {
-			$star.removeClass("fa-star").addClass("fa-star-o");
-		}
-	// full stars
-	} else {
-		let $stars = $(".score-panel .stars .fa");
-		$stars.removeClass("fa-star-o").addClass("fa-star");
-	}
 }
 
 function updatestarCounter() {
-	starCounter = STAR_NUMBER - Math.floor(moveCounter / CARD_ICONS.length);
+	starCounter = STAR_NUMBER - Math.floor((moveCounter - 1) / CARD_ICONS.length);
 	starCounter = Math.max(0, starCounter);
 }
 
