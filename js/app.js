@@ -62,8 +62,8 @@ function initGame() {
 	matchStack = [],
 	moveCounter = 0,
 	starCounter = STAR_NUMBER;
-	addRestartButtonListener($(".restart"));
-	addPlayAgainButtonListener($(".play-again"));
+	addRestartButtonListener($(".score-panel .restart"));
+	addPlayAgainButtonListener($(".ending-modal button.play-again"));
 
 	// hide ending modal
 
@@ -314,10 +314,29 @@ function handleMatch(openStack, match) {
 // TODO: render stars
 function renderStars() {
 	updatestarCounter();
+	// if(starCounter < STAR_NUMBER) {
+	// 	$(".score-panel .stars .fa-star").eq(starCounter).css("display", "none");
+	// 	$(".score-panel .stars .fa-star-o").eq(starCounter).css("display", "inline-block");
+	// } else {
+	// 	$(".score-panel .stars .fa-star").css("display", "inline-block");
+	// 	$(".score-panel .stars .fa-star-o").css("display", "none");
+	// }
+
+	//starCounter are less then STAR_NUMBER
+	if(starCounter < STAR_NUMBER) {
+		let $star = $(".score-panel .stars .fa").eq(starCounter);
+		if($star.hasClass("fa-star")) {
+			$star.removeClass("fa-star").addClass("fa-star-o");
+		}
+	// full stars
+	} else {
+		let $stars = $(".score-panel .stars .fa");
+		$stars.removeClass("fa-star-o").addClass("fa-star");
+	}
 }
 
 function updatestarCounter() {
-	starCounter -= Math.floor(moveCounter / CARD_ICONS.length);
+	starCounter = STAR_NUMBER - Math.floor(moveCounter / CARD_ICONS.length);
 	starCounter = Math.max(0, starCounter);
 }
 
@@ -400,10 +419,10 @@ function formatMilliseconds(time) {
 		if (m === 0) {
 			formattedTime = `${s}s`;
 		} else {
-			formattedTime = `${m} m ${s}s`;
+			formattedTime = `${m}m ${s}s`;
 		}
 	} else {
-		formattedTime = `${h} h ${m} m ${s}s`;
+		formattedTime = `${h}h ${m}m ${s}s`;
 	}
 
 	return formattedTime;
