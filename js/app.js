@@ -314,16 +314,16 @@ function handleMatch(openStack, match) {
 // TODO: render stars
 function renderStars() {
 	updatestarCounter();
-	// if(starCounter < STAR_NUMBER) {
-	// 	let $star = $(".score-panel .stars .fa").eq(starCounter);
-	// 	if($star.hasClass("fa-star")) {
-	// 		$star.removeClass("fa-star").addClass("fa-star-o");
-	// 	}
-	// // full stars
-	// } else {
-	// 	let $stars = $(".score-panel .stars .fa");
-	// 	$stars.removeClass("fa-star-o").addClass("fa-star");
-	// }
+	if(starCounter < STAR_NUMBER) {
+		let $star = $(".score-panel .stars .fa").eq(starCounter);
+		if($star.hasClass("fa-star")) {
+			$star.removeClass("fa-star").addClass("fa-star-o");
+		}
+	// full stars
+	} else {
+		let $stars = $(".score-panel .stars .fa");
+		$stars.removeClass("fa-star-o").addClass("fa-star");
+	}
 }
 
 function updatestarCounter() {
