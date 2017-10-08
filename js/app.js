@@ -327,7 +327,7 @@ function renderStars() {
 }
 
 function updatestarCounter() {
-	starCounter = STAR_NUMBER - Math.floor((moveCounter - 4) / CARD_ICONS.length);
+	starCounter = STAR_NUMBER - Math.floor((moveCounter - 5) / CARD_ICONS.length);
 	starCounter = Math.max(0, starCounter);
 }
 
