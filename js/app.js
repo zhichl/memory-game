@@ -319,7 +319,7 @@ function renderStars() {
 		if($star.hasClass("fa-star")) {
 			$star.removeClass("fa-star").addClass("fa-star-o");
 		}
-	// full stars
+	// all stars
 	} else {
 		let $stars = $(".score-panel .stars .fa");
 		$stars.removeClass("fa-star-o").addClass("fa-star");
@@ -327,7 +327,7 @@ function renderStars() {
 }
 
 function updatestarCounter() {
-	starCounter = STAR_NUMBER - Math.floor((moveCounter - 1) / CARD_ICONS.length);
+	starCounter = STAR_NUMBER - Math.floor((moveCounter - 4) / CARD_ICONS.length);
 	starCounter = Math.max(0, starCounter);
 }
 
