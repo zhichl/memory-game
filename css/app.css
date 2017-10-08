@@ -126,6 +126,9 @@ h1 {
 
 .ending-modal {
     display: none;
+    position: relative;
+    top: 30%;
+    transform: translateY(-50%);
     color: rgb(107, 107, 107);
     font-family: 'Open Sans', sans-serif;
     font-weight: 300;
