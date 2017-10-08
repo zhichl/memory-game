@@ -277,12 +277,13 @@ function handleMatch(openStack, match) {
 		for (let card of openStack) {
 			card.matchCard();
 		}
-		for (let $card of $cards) {
-			// $cardIcon = $card.children().first();
-			$card.addClass("match");
 
-			//TODO: do something animating with matched card li
-		}
+		setTimeout(() => {
+			for (let $card of $cards) {
+				$card.addClass("match");
+				//TODO: do something animating with matched card li
+			}
+		}, 300);
 
 		// if cards are not matched
 	} else if (match === Match.NOT_MATCH) {
@@ -292,14 +293,17 @@ function handleMatch(openStack, match) {
 			card.closeCard();
 		}
 
-		for (let $card of $cards) {
-			$card.addClass("match-fail");
-		}
+		setTimeout(() => {
+			for (let $card of $cards) {
+				$card.addClass("match-fail");
+			}
+		}, 200);
+
 		setTimeout(() => {
 			for (let $card of $cards) {
 				$card.removeClass("open show match-fail");
 			}
-		}, 300);
+		}, 500);
 	}
 	// TODO: (further work) if cards are incompletely matched(match === Match.INCOMPLETE_MATCH), do something
 
