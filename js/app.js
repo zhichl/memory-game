@@ -297,13 +297,13 @@ function handleMatch(openStack, match) {
 			for (let $card of $cards) {
 				$card.addClass("match-fail");
 			}
-		}, 200);
+		}, 300);
 
 		setTimeout(() => {
 			for (let $card of $cards) {
 				$card.removeClass("open show match-fail");
 			}
-		}, 500);
+		}, 600);
 	}
 	// TODO: (further work) if cards are incompletely matched(match === Match.INCOMPLETE_MATCH), do something
 
