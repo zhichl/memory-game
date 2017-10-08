@@ -132,16 +132,16 @@ h1 {
     text-align: center;
 }
 
-.congrats-msg {
+.ending-modal .congrats-msg {
     margin-bottom: 1.5em;
 }
 
-.congrats-msg h1 {
+.ending-modal .congrats-msg h1 {
     font-weight: 800;
     margin-bottom: 0.5em;
 }
 
-button.play-again {
+.ending-modal button.play-again {
     width: 150px;
     height: 40px;
     border-radius: 5px;
@@ -152,10 +152,10 @@ button.play-again {
     cursor: pointer;
 }
 
-button:active {
+.ending-modal button:active {
     background-color: #1f6d4f;
 }
 
-button:focus {
+.ending-modal button:focus {
     outline: none;
 }
