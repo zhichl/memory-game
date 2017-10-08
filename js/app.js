@@ -49,7 +49,8 @@ let cards = [],
 	openStack = [],
 	matchStack = [],
 	moveCounter = 0,
-	starCounter = 0;
+	starCounter = 0,
+	timers = [];
 
 
 initGame();
@@ -69,6 +70,7 @@ function initGame() {
 }
 
 function startGame() {
+	timers[0] = new Date();
 	// TODO: (for testing) uncomment shuffle process
 	shuffleCards();
 
@@ -87,6 +89,7 @@ function startGame() {
 }
 
 function endGame() {
+	timers[1] = new Date();
 	updateStatsText();
 	setTimeout(() => {
 		hideGameBoard();
@@ -110,10 +113,14 @@ function hideEndingModal() {
 	$(".ending-modal").css("display", "none");
 }
 
+// unpdate info statistics
 function updateStatsText() {
-	// statistics
+	// stars / moves / time
 	let starText = "stars",
-		moveText = "moves";
+		moveText = "moves",
+		timeElapsed = timers[1] - timers[0],
+		timeText = formatMilliseconds(timeElapsed);
+
 	if (moveCounter < 2 || starCounter < 2) {
 		if (moveCounter < 2) {
 			moveText = "move";
@@ -122,8 +129,11 @@ function updateStatsText() {
 			starText = "star";
 		}
 	}
-	let statsText = `With ${moveCounter} ${moveText} and ${starCounter} ${starText}`;
-	$(".stats").text(statsText);
+
+	let msStats = `With ${moveCounter} ${moveText} and ${starCounter} ${starText}`,
+		timeStats = `Time: ${timeText}`;
+	$(".moves-stars").text(msStats);
+	$(".time").text(timeStats);
 }
 
 function addPlayAgainButtonListener($button) {
@@ -264,7 +274,7 @@ function handleMatch(openStack, match) {
 
 	// if cards are completely matched, 
 	if (match === Match.COMPLETE_MATCH) {
-		for(let card of openStack) {
+		for (let card of openStack) {
 			card.matchCard();
 		}
 		for (let $card of $cards) {
@@ -278,7 +288,7 @@ function handleMatch(openStack, match) {
 	} else if (match === Match.NOT_MATCH) {
 		//TODO: do something animating with failing match
 
-		for(let card of openStack) {
+		for (let card of openStack) {
 			card.closeCard();
 		}
 
@@ -376,4 +386,25 @@ function updateMatchStack(match) {
 
 function checkWin() {
 	return matchStack.length === CARD_NUMBER;
+}
+
+function formatMilliseconds(time) {
+	let formattedTime = "";
+	time = Math.floor(time / 1000);
+	let h = Math.floor(time / 3600);
+	time %= 3600;
+	let m = Math.floor(time / 60);
+	let s = time % 60;
+
+	if (h === 0) {
+		if (m === 0) {
+			formattedTime = `${s}s`;
+		} else {
+			formattedTime = `${m} m ${s}s`;
+		}
+	} else {
+		formattedTime = `${h} h ${m} m ${s}s`;
+	}
+
+	return formattedTime;
 }
