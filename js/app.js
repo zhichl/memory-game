@@ -9,12 +9,30 @@ class Card {
 		this.icon = icon;
 		this.faClasses = "fa " + icon;
 		this.index = index;
+		this.open = false;
+		this.matched = false;
 	}
 
 	updateIndex(index) {
 		this.index = index;
 	}
 
+	openCard() {
+		this.open = true;
+	}
+
+	closeCard() {
+		this.open = false;
+	}
+
+	matchCard() {
+		this.match = true;
+	}
+
+	resetState() {
+		this.open = false;
+		this.matched = false;
+	}
 }
 
 // mimic Enum in Java / C++ for simple use and not type safe
@@ -39,10 +57,10 @@ startGame();
 
 function initGame() {
 	cards = initCards(CARD_ICONS, MATCH_NUMBER),
-		openStack = [],
-		matchStack = [],
-		moveCounter = 0,
-		starCounter = STAR_NUMBER;
+	openStack = [],
+	matchStack = [],
+	moveCounter = 0,
+	starCounter = STAR_NUMBER;
 	addRestartButtonListener($(".restart"));
 	addPlayAgainButtonListener($(".play-again"));
 
@@ -53,6 +71,8 @@ function initGame() {
 function startGame() {
 	// TODO: (for testing) uncomment shuffle process
 	shuffleCards();
+
+	// TODO: bundle resest methods
 	resetMatchStack();
 	resetOpenStack();
 	resetMoveCounter();
@@ -150,6 +170,7 @@ function shuffle(array) {
 		array[currentIndex] = array[randomIndex];
 		array[randomIndex] = temporaryValue;
 		array[currentIndex].updateIndex(currentIndex);
+		array[currentIndex].resetState();
 	}
 
 	return array;
@@ -201,12 +222,13 @@ function addCardListener($element) {
 
 		// get corresponding card index
 		let cardIndex = $(this).index();
-		let lastCard = openStack[openStack.length - 1];
+		let card = cards[cardIndex];
 
-		// skip actions if the same card is being clicked continuously more than once
-		if (!(lastCard && cardIndex === lastCard.index)) {
+		// skip further actions if this card is already open or has been matched before click
+		if (!card.open && !card.matched) {
 			// add to open stack
-			openStack.push(cards[cardIndex]);
+			card.openCard();
+			openStack.push(card);
 			// check match and update
 			let match = checkMatch(openStack);
 			renderMoves(match);
@@ -242,6 +264,9 @@ function handleMatch(openStack, match) {
 
 	// if cards are completely matched, 
 	if (match === Match.COMPLETE_MATCH) {
+		for(let card of openStack) {
+			card.matchCard();
+		}
 		for (let $card of $cards) {
 			// $cardIcon = $card.children().first();
 			$card.addClass("match");
@@ -252,6 +277,10 @@ function handleMatch(openStack, match) {
 		// if cards are not matched
 	} else if (match === Match.NOT_MATCH) {
 		//TODO: do something animating with failing match
+
+		for(let card of openStack) {
+			card.closeCard();
+		}
 
 		for (let $card of $cards) {
 			$card.addClass("match-fail");
@@ -268,11 +297,8 @@ function handleMatch(openStack, match) {
 	updateStacks(match);
 	let won = checkWin();
 	if (won) {
-		log(`moves before ending game: ${moveCounter}`);
 		endGame();
 	}
-	// log("matchStack length: " + matchStack.length);
-	// log(won);
 }
 
 // TODO: render stars
