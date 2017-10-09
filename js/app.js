@@ -174,22 +174,26 @@ function createCards(icons, matchNumber) {
 	return cards;
 }
 
-// shuffle array in place, implementing Fisher–Yates shuffle algorithm
-function shuffle(arr) {
-	let currentIndex = arr.length,
+function shuffleCards() {
+	cards = shuffle(cards);
+}
+
+// shuffle cards in place, implementing Fisher–Yates shuffle algorithm
+function shuffle(cards) {
+	let currentIndex = cards.length,
 		randomIndex;
 
 	while (currentIndex > 0) {
 		randomIndex = Math.floor(Math.random() * currentIndex);
 		currentIndex -= 1;
 		// swap by destructuring
-		[arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+		[cards[currentIndex], cards[randomIndex]] = [cards[randomIndex], cards[currentIndex]];
 		// change card attrbute after shuffling
-		arr[currentIndex].updateIndex(currentIndex);
-		arr[currentIndex].resetState();
+		cards[currentIndex].updateIndex(currentIndex);
+		cards[currentIndex].resetState();
 	}
 
-	return arr;
+	return cards;
 }
 
 function renderCards() {
@@ -352,10 +356,6 @@ function updateMoveCounter(match) {
 	if (match === Match.COMPLETE_MATCH || match === Match.MISMATCH) {
 		moveCounter++;
 	}
-}
-
-function shuffleCards() {
-	cards = shuffle(cards);
 }
 
 function resetMatchStack() {
