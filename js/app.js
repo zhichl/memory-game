@@ -1,8 +1,9 @@
 const MATCH_NUMBER = 2;
 const CARD_ICONS = ["fa-anchor", "fa-bolt", "fa-leaf", "fa-diamond", "fa-bomb", "fa-bicycle", "fa-paper-plane-o", "fa-cube"];
-const CARD_NUMBER = MATCH_NUMBER * CARD_ICONS.length;
+const PATTERN_NUMBER = CARD_ICONS.length;
+const CARD_NUMBER = MATCH_NUMBER * PATTERN_NUMBER;
 const STAR_NUMBER = 3;
-const log = console.log.bind(console);
+const FULL_STAR_ERROR_TOLERANCE = 4;
 
 class Card {
 	constructor(icon, index) {
@@ -35,66 +36,71 @@ class Card {
 	}
 }
 
-// mimic Enum in Java / C++ for simple use and not type safe
+// mimic Enum in Java / C++ for simple use (not type safe)
 const Match = {
-	NOT_MATCH: "not match",
+	MISMATCH: "not matched",
 	INCOMPLETE_MATCH: "incomplete match",
 	COMPLETE_MATCH: "complete match"
 };
 
+// prevent properties in Match from being modified
 Object.freeze(Match);
 
-// init game
-let cards = [],
-	openStack = [],
-	matchStack = [],
-	moveCounter = 0,
-	starCounter = 0,
-	timers = [];
+//global variable declaration
+let cards, openStack, matchStack, 
+	moveCounter, starCounter, timers;
 
 
+// init game, called only once
 initGame();
+
+// start game, called either restart button or play-again button is clicked
 startGame();
 
 function initGame() {
-	cards = initCards(CARD_ICONS, MATCH_NUMBER),
+	cards = createCards(CARD_ICONS, MATCH_NUMBER),
 	openStack = [],
 	matchStack = [],
 	moveCounter = 0,
-	starCounter = STAR_NUMBER;
+	starCounter = STAR_NUMBER,
+	timers = [];
 	addRestartButtonListener($(".score-panel .restart"));
 	addPlayAgainButtonListener($(".ending-modal button.play-again"));
-
-	// hide ending modal
-
 }
 
 function startGame() {
-	timers[0] = new Date();
-	// TODO: (for testing) uncomment shuffle process
 	shuffleCards();
 
-	// TODO: bundle resest methods
+	// reset global variables / card stacks
+	resetGlobalVars();
+
+	// dynamically create / update card HTML
+	renderCards();
+
+	// hide ending modal and display game board
+	hideEndingModal();
+	displayGameBoard();
+
+	// set timer, game starts
+	startTimer(timers);
+}
+
+function endGame() {
+	endTimer(timers);
+	updateStatsText();
+	setTimeout(() => {
+		hideGameBoard();
+		displayEndingModal();
+	}, 500);
+}
+
+function resetGlobalVars() {
 	resetMatchStack();
 	resetOpenStack();
 	resetMoveCounter();
 	renderMoves();
 	resetStarCounter();
 	renderStars();
-
-	// dynamically create card HTML
-	renderCards();
-	hideEndingModal();
-	displayGameBoard();
-}
-
-function endGame() {
-	timers[1] = new Date();
-	updateStatsText();
-	setTimeout(() => {
-		hideGameBoard();
-		displayEndingModal();
-	}, 500);
 }
 
 function displayGameBoard() {
@@ -111,6 +117,14 @@ function displayEndingModal() {
 
 function hideEndingModal() {
 	$(".ending-modal").css("display", "none");
+}
+
+function startTimer(timers) {
+	timers[0] = new Date();
+}
+
+function endTimer(timers) {
+	timers[1] = new Date();
 }
 
 // unpdate info statistics
@@ -142,14 +156,8 @@ function addPlayAgainButtonListener($button) {
 	});
 }
 
-/**
- * 
- * 
- * @param {any} icons
- * @param {any} matchNumber 
- * @returns 
- */
-function initCards(icons, matchNumber) {
+// create new cards and return
+function createCards(icons, matchNumber) {
 	let cards = [],
 		index = 0,
 		number = matchNumber;
@@ -165,28 +173,23 @@ function initCards(icons, matchNumber) {
 	return cards;
 }
 
-// Shuffle function
-// shuffle the card array in place, implementing Fisher–Yates shuffle algorithm.
-function shuffle(array) {
+// shuffle array in place, implementing Fisher–Yates shuffle algorithm.
+function shuffle(arr) {
+	let currentIndex = arr.length,
+		randomIndex;
 
-	// TODO: modify shuffle method
-	let currentIndex = array.length,
-		temporaryValue, randomIndex;
-
-	while (currentIndex !== 0) {
+	while (currentIndex > 0) {
 		randomIndex = Math.floor(Math.random() * currentIndex);
 		currentIndex -= 1;
-		temporaryValue = array[currentIndex];
-		array[currentIndex] = array[randomIndex];
-		array[randomIndex] = temporaryValue;
-		array[currentIndex].updateIndex(currentIndex);
-		array[currentIndex].resetState();
+		// swap by destructuring
+		[arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+		// change card attrbute after shuffling
+		arr[currentIndex].updateIndex(currentIndex);
+		arr[currentIndex].resetState();
 	}
 
-	return array;
+	return arr;
 }
-
-// TODO: add a cards html updating method and modify renderCards method
 
 function renderCards() {
 	deleteCardsHTML();
@@ -257,7 +260,7 @@ function checkMatch(cards) {
 		}
 		// not matched at all
 		if (!matched) {
-			return Match.NOT_MATCH;
+			return Match.MISMATCH;
 		}
 	}
 
@@ -269,7 +272,6 @@ function checkMatch(cards) {
 }
 
 function handleMatch(openStack, match) {
-
 	let $cards = getNodeListFromCards(openStack);
 
 	// if cards are completely matched, 
@@ -278,21 +280,21 @@ function handleMatch(openStack, match) {
 			card.matchCard();
 		}
 
+		// timeout to create simple matching effect
 		setTimeout(() => {
 			for (let $card of $cards) {
 				$card.addClass("match");
-				//TODO: do something animating with matched card li
+				//TODO: (future work) do something animating with card matching
 			}
 		}, 300);
 
 		// if cards are not matched
-	} else if (match === Match.NOT_MATCH) {
-		//TODO: do something animating with failing match
-
+	} else if (match === Match.MISMATCH) {
 		for (let card of openStack) {
 			card.closeCard();
 		}
 
+		// timeouts to create simple dismatching effect
 		setTimeout(() => {
 			for (let $card of $cards) {
 				$card.addClass("match-fail");
@@ -304,8 +306,9 @@ function handleMatch(openStack, match) {
 				$card.removeClass("open show match-fail");
 			}
 		}, 600);
+		//TODO: (future work) do something animating with failing match
 	}
-	// TODO: (further work) if cards are incompletely matched(match === Match.INCOMPLETE_MATCH), do something
+	// TODO: (future work) if cards are incompletely matched(match === Match.INCOMPLETE_MATCH), do something
 
 	// check win
 	updateStacks(match);
@@ -315,7 +318,7 @@ function handleMatch(openStack, match) {
 	}
 }
 
-// TODO: render stars
+// render stars in the page according to the current star count
 function renderStars() {
 	updatestarCounter();
 	if(starCounter < STAR_NUMBER) {
@@ -330,8 +333,11 @@ function renderStars() {
 	}
 }
 
+// count stars based on current moves
+// full stars when moves <= pattern-number + fullstar error tolerance  (12 moves)
+// decrease one star after then when every pattern-number moves added (8 moves)
 function updatestarCounter() {
-	starCounter = STAR_NUMBER - Math.floor((moveCounter - 5) / CARD_ICONS.length);
+	starCounter = STAR_NUMBER - Math.floor((moveCounter - FULL_STAR_ERROR_TOLERANCE - 1) / PATTERN_NUMBER);
 	starCounter = Math.max(0, starCounter);
 }
 
@@ -340,8 +346,9 @@ function renderMoves(match) {
 	$(".moves").text(moveCounter);
 }
 
+// one move is added as a complete match or a mismatch is presented
 function updateMoveCounter(match) {
-	if (match === Match.COMPLETE_MATCH || match === Match.NOT_MATCH) {
+	if (match === Match.COMPLETE_MATCH || match === Match.MISMATCH) {
 		moveCounter++;
 	}
 }
@@ -384,12 +391,14 @@ function updateStacks(match) {
 	updateOpenStack(match);
 }
 
+// empty open stack when cards inside are completely matched or not matched
 function updateOpenStack(match) {
-	if (match === Match.COMPLETE_MATCH || match === Match.NOT_MATCH) {
+	if (match === Match.COMPLETE_MATCH || match === Match.MISMATCH) {
 		resetOpenStack();
 	}
 }
 
+// if a complete match, add matched cards to matchStack
 function updateMatchStack(match) {
 	if (match === Match.COMPLETE_MATCH) {
 		for (let card of openStack) {
@@ -402,6 +411,7 @@ function checkWin() {
 	return matchStack.length === CARD_NUMBER;
 }
 
+// format ms to readable time string
 function formatMilliseconds(time) {
 	let formattedTime = "";
 	time = Math.floor(time / 1000);
