@@ -8,19 +8,19 @@ Click to play the game: [Memory Game: Matching](https://zhichl.github.io/memory-
 
 ### I. Components and logics
 
-####Game board
+#### Game board
 
 Game board is the playing interface. It contains statistics on the top and card deck as the main part. 
 
-####Ending modal
+#### Ending modal
 
 An ending modal is shown when the player matches all the cards on card deck. It shows the final statistical information throughout the game, including moves have been taken to win the game, stars that rates the performance according to moves and times that elapsed  winning a game.
 
-####Class
+#### Class
 
 Card class, containing card properties and state information.
 
-####Global variables 
+#### Global variables 
 
 | Variable          | Notes                                    |
 | :---------------- | :--------------------------------------- |
@@ -31,7 +31,7 @@ Card class, containing card properties and state information.
 | ```starCounter``` | Count stars based on moves. Since winning is perfect when using only 8 (pattern number of cards) moves to win, which is of very low likeliness, an error-tolerance (4 moves) is added to achieve a full-star rating. Therefore full-star (3 stars) is rated when moves are less then or equal to 12 (8 + 4). After then, stars decreases by one when every 8 (pattern number) moves is added. |
 | ```Time```        | Record the time elapsed from game start through the end. |
 
-####Extensibility  
+#### Extensibility  
 
 1. Number of patterns(icons) of card can be increased to upgrade the difficulty of game.
 
