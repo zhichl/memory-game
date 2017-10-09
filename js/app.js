@@ -47,7 +47,7 @@ const Match = {
 Object.freeze(Match);
 
 //global variable declaration
-let cards, openStack, matchStack, 
+let cards, openStack, matchStack,
 	moveCounter, starCounter, timers;
 
 
@@ -131,8 +131,9 @@ function endTimer(timers) {
 function updateStatsText() {
 	// stars / moves / time
 	let starText = "stars",
-		moveText = "moves",
-		timeElapsed = timers[1] - timers[0],
+		moveText = "moves";
+
+	const timeElapsed = timers[1] - timers[0],
 		timeText = formatMilliseconds(timeElapsed);
 
 	if (moveCounter < 2 || starCounter < 2) {
@@ -144,7 +145,7 @@ function updateStatsText() {
 		}
 	}
 
-	let msStats = `With ${moveCounter} ${moveText} and ${starCounter} ${starText}`,
+	const msStats = `With ${moveCounter} ${moveText} and ${starCounter} ${starText}`,
 		timeStats = `Time: ${timeText}`;
 	$(".moves-stars").text(msStats);
 	$(".time").text(timeStats);
@@ -164,7 +165,7 @@ function createCards(icons, matchNumber) {
 
 	for (let icon of icons) {
 		while (number-- > 0) {
-			let card = new Card(icon, index);
+			const card = new Card(icon, index);
 			cards.push(card);
 			index++;
 		}
@@ -173,7 +174,7 @@ function createCards(icons, matchNumber) {
 	return cards;
 }
 
-// shuffle array in place, implementing Fisher–Yates shuffle algorithm.
+// shuffle array in place, implementing Fisher–Yates shuffle algorithm
 function shuffle(arr) {
 	let currentIndex = arr.length,
 		randomIndex;
@@ -234,8 +235,8 @@ function addCardListener($element) {
 		$(this).addClass("open show");
 
 		// get corresponding card index
-		let cardIndex = $(this).index();
-		let card = cards[cardIndex];
+		const cardIndex = $(this).index(),
+			card = cards[cardIndex];
 
 		// skip further actions if this card is already open or has been matched before click
 		if (!card.open && !card.matched) {
@@ -243,7 +244,7 @@ function addCardListener($element) {
 			card.openCard();
 			openStack.push(card);
 			// check match and update
-			let match = checkMatch(openStack);
+			const match = checkMatch(openStack);
 			renderMoves(match);
 			renderStars();
 			handleMatch(openStack, match);
@@ -264,7 +265,7 @@ function checkMatch(cards) {
 		}
 	}
 
-	// if a incomplete match, further check if it's a complete match
+	// if an incomplete match, further check if it's a complete match
 	if (match === Match.INCOMPLETE_MATCH && cards.length === MATCH_NUMBER) {
 		match = Match.COMPLETE_MATCH;
 	}
@@ -272,7 +273,7 @@ function checkMatch(cards) {
 }
 
 function handleMatch(openStack, match) {
-	let $cards = getNodeListFromCards(openStack);
+	const $cards = getNodeListFromCards(openStack);
 
 	// if cards are completely matched, 
 	if (match === Match.COMPLETE_MATCH) {
@@ -312,7 +313,7 @@ function handleMatch(openStack, match) {
 
 	// check win
 	updateStacks(match);
-	let won = checkWin();
+	const won = checkWin();
 	if (won) {
 		endGame();
 	}
@@ -321,14 +322,14 @@ function handleMatch(openStack, match) {
 // render stars in the page according to the current star count
 function renderStars() {
 	updatestarCounter();
-	if(starCounter < STAR_NUMBER) {
-		let $star = $(".score-panel .stars .fa").eq(starCounter);
-		if($star.hasClass("fa-star")) {
+	if (starCounter < STAR_NUMBER) {
+		const $star = $(".score-panel .stars .fa").eq(starCounter);
+		if ($star.hasClass("fa-star")) {
 			$star.removeClass("fa-star").addClass("fa-star-o");
 		}
-	// all stars
+		// all stars
 	} else {
-		let $stars = $(".score-panel .stars .fa");
+		const $stars = $(".score-panel .stars .fa");
 		$stars.removeClass("fa-star-o").addClass("fa-star");
 	}
 }
@@ -413,22 +414,37 @@ function checkWin() {
 
 // format ms to readable time string
 function formatMilliseconds(time) {
-	let formattedTime = "";
 	time = Math.floor(time / 1000);
-	let h = Math.floor(time / 3600);
+	const h = Math.floor(time / 3600);
 	time %= 3600;
-	let m = Math.floor(time / 60);
-	let s = time % 60;
+	const m = Math.floor(time / 60);
+	const s = time % 60;
+	let formattedTime,
+		hText = `${m}m `,
+		mText = `${m}m `,
+		sText = `${s}s`;
 
 	if (h === 0) {
+		hText = "";
+		// h === 0 && m === 0
 		if (m === 0) {
-			formattedTime = `${s}s`;
+			mText = "";
+			// h === 0 && m > 0
 		} else {
-			formattedTime = `${m}m ${s}s`;
+			if (0 < s && s < 10) {
+				sText = "0" + sText;
+			}
 		}
+		// h > 0
 	} else {
-		formattedTime = `${h}h ${m}m ${s}s`;
+		if (0 < m && m < 10) {
+			mText = "0" + mText;
+		}
+		if (0 < s && s < 10) {
+			sText = "0" + sText;
+		}
 	}
+	formattedTime = hText + mText + sText;
 
 	return formattedTime;
 }
