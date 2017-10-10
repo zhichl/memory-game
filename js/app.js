@@ -47,7 +47,6 @@ class Timer {
 	start() {
 		this.startTime = new Date()
 		this.timer = setInterval(() => {
-			console.log("setInterval called")
 			const now = new Date()
 			this.endTime = now
 			this.timeElapsed = this.endTime - this.startTime
@@ -60,8 +59,6 @@ class Timer {
 	}
 
 	reset() {
-		console.log("reset starts")
-		console.log(this.timer)
 		this.end()
 		this.startTime = 0
 		this.endTime = 0
@@ -475,7 +472,7 @@ function checkWin() {
 	return matchStack.length === CARD_NUMBER
 }
 
-// format ms to readable time string
+// format ms to real-time clock string
 function formatMilliseconds(time) {
 	time = Math.floor(time / 1000)
 	const h = Math.floor(time / 3600)
@@ -499,7 +496,6 @@ function formatMilliseconds(time) {
 	formattedTime = hText + mText + sText
 
 	return formattedTime
-
 }
 
 // format ms to descriptive time string
