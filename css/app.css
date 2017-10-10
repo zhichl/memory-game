@@ -32,6 +32,7 @@ body {
 h1 {
     font-family: 'Open Sans', sans-serif;
     font-weight: 300;
+    font-size: 3.6vw;
 }
 
 
@@ -44,11 +45,11 @@ h1 {
  */
 
 .deck {
-    width: 660px;
-    min-height: 680px;
+    width: 75vw;
+    min-height: 78vw;
     background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%);
-    padding: 32px;
-    border-radius: 10px;
+    padding: 3.6vw;
+    border-radius: 1.1vw;
     box-shadow: 12px 15px 20px 0 rgba(46, 61, 73, 0.5);
     display: flex;
     flex-wrap: wrap;
@@ -58,17 +59,17 @@ h1 {
 }
 
 .deck .card {
-    height: 125px;
-    width: 125px;
+    width: 14.3vw;
+    height: 14.3vw;
     background: #2e3d49;
     font-size: 0;
     color: #ffffff;
-    border-radius: 8px;
+    border-radius: 0.9vw;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
+    box-shadow: 0.6vw 0.24vw 2.4vw 0 rgba(46, 61, 73, 0.5);
 }
 
 .deck .card.open {
@@ -78,13 +79,13 @@ h1 {
 }
 
 .deck .card.show {
-    font-size: 33px;
+    font-size: 3.7vw;
 }
 
 .deck .card.match {
     cursor: default;
     background: #02ccba;
-    font-size: 33px;
+    font-size: 3.7vw;
 }
 
 .deck .card.match-fail {
@@ -98,8 +99,9 @@ h1 {
 
 .score-panel {
     text-align: left;
-    width: 345px;
-    margin-bottom: 10px;
+    width: 50vw;
+    margin-bottom: 1.1vw;
+    font-size: 1.8vw;
 }
 
 .score-panel .stars {
@@ -114,6 +116,11 @@ h1 {
     display: inline-block;
 }
 
+.score-panel .timer {
+    float: right;
+    margin: 0 1.7vw 0 0;
+}
+
 .score-panel .restart {
     float: right;
     cursor: pointer;
@@ -121,7 +128,7 @@ h1 {
 
 
 /*
- * Styles for the winning page
+ * Styles for the winning modal
  */
 
 .ending-modal {
@@ -141,6 +148,7 @@ h1 {
 
 .ending-modal .congrats-msg h1 {
     font-weight: 800;
+    font-size: 2em;
     margin-bottom: 0.5em;
 }
 
@@ -148,7 +156,7 @@ h1 {
     width: 150px;
     height: 40px;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 1em;
     color: #fff;
     background-color: #30c58c;
     border: none;
@@ -162,3 +170,53 @@ h1 {
 .ending-modal button:focus {
     outline: none;
 }
+
+/* 
+    Style for different screen size 
+*/
+
+@media screen and (max-width: 440px) {
+    .ending-modal .congrats-msg h1 {
+        font-size: 1.5em;
+    }
+}
+
+@media screen and (min-width: 880px) {
+    h1 {
+        font-size: 2em;
+    }
+
+    .deck {
+        width: 660px;
+        min-height: 680px;
+        padding: 32px;
+        border-radius: 10px;
+    }
+
+    .deck .card {
+        width: 125px;
+        height: 125px;
+        box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
+        border-radius: 8px;
+    }
+
+    .deck .card.show {
+        font-size: 33px;
+    }
+
+    .deck .card.match {
+        font-size: 33px;
+    }
+
+    .score-panel {
+        width: 440px;
+        font-size: inherit;
+        margin-bottom: 10px;
+    }
+
+    .score-panel .timer {
+        float: right;
+        margin: 0 15px 0 0;
+    }
+}
+
