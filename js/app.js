@@ -36,6 +36,41 @@ class Card {
 	}
 }
 
+class Timer {
+	constructor() {
+		this.startTime = 0
+		this.endTime = 0
+		this.timer = null
+		this.timeElapsed = 0
+	}
+
+	start() {
+		this.startTime = new Date()
+		this.timer = setInterval(() => {
+			console.log("setInterval called")
+			const now = new Date()
+			this.endTime = now
+			this.timeElapsed = this.endTime - this.startTime
+			renderTimer()
+		},500)
+	}
+
+	end() {
+		clearInterval(this.timer)
+	}
+
+	reset() {
+		console.log("reset starts")
+		console.log(this.timer)
+		this.end()
+		this.startTime = 0
+		this.endTime = 0
+		this.timer = null
+		this.timeElapsed = 0
+	}
+
+}
+
 // mimic Enum in Java / C++ for simple use (not type safe)
 const Match = {
 	MISMATCH: "not matched",
@@ -48,45 +83,52 @@ Object.freeze(Match)
 
 //global variable declaration
 let cards, openStack, matchStack,
-	moveCounter, starCounter, timers
+	// moveCounter, starCounter, timers
+	moveCounter, starCounter, timer
 
 
 // init game, called only once
 initGame()
 
-// start game, called either restart button or play-again button is clicked
-startGame()
+// make game ready to start, called either restart button or play-again button is clicked
+resetGame()
 
 function initGame() {
-	cards = createCards(CARD_ICONS, MATCH_NUMBER),
-	openStack = [],
-	matchStack = [],
-	moveCounter = 0,
-	starCounter = STAR_NUMBER,
-	timers = []
+	cards = createCards(CARD_ICONS, MATCH_NUMBER)
+	openStack = []
+	matchStack = []
+	moveCounter = 0
+	starCounter = STAR_NUMBER
+	timer = new Timer()
 	addRestartButtonListener($(".score-panel .restart"))
 	addPlayAgainButtonListener($(".ending-modal button.play-again"))
 }
 
-function startGame() {
+function resetGame() {
 	shuffleCards()
-
-	// reset global variables / card stacks
-	resetGlobalVars()
 
 	// dynamically create / update card HTML
 	renderCards()
 
+	// reset global variables / card stacks
+	resetGlobalVars()
+
+	// render score panel
+	renderScorePanel()
+
 	// hide ending modal and display game board
 	hideEndingModal()
 	displayGameBoard()
+}
 
+function startGame() {
 	// set timer, game starts
-	startTimer(timers)
+	startTimer()
 }
 
 function endGame() {
-	endTimer(timers)
+	// endTimer(timers)
+	endTimer()
 	updateStatsText()
 	setTimeout(() => {
 		hideGameBoard()
@@ -98,9 +140,14 @@ function resetGlobalVars() {
 	resetMatchStack()
 	resetOpenStack()
 	resetMoveCounter()
-	renderMoves()
 	resetStarCounter()
+	resetTimer()
+}
+
+function renderScorePanel() {
+	renderMoves()
 	renderStars()
+	renderTimer()
 }
 
 function displayGameBoard() {
@@ -119,12 +166,18 @@ function hideEndingModal() {
 	$(".ending-modal").css("display", "none")
 }
 
-function startTimer(timers) {
-	timers[0] = new Date()
+function startTimer() {
+	timer.start()
 }
 
-function endTimer(timers) {
-	timers[1] = new Date()
+function endTimer() {
+	timer.end()
+}
+
+function renderTimer() {
+	const timeElapsed = formatMilliseconds(timer.timeElapsed)
+	console.log(timeElapsed)
+	$(".game-board .score-panel .timer").text(timeElapsed)
 }
 
 // unpdate info statistics
@@ -133,8 +186,8 @@ function updateStatsText() {
 	let starText = "stars",
 		moveText = "moves"
 
-	const timeElapsed = timers[1] - timers[0],
-		timeText = formatMilliseconds(timeElapsed)
+	const timeElapsed = timer.timeElapsed,
+		timeText = getDescriptiveTime(timeElapsed)
 
 	if (moveCounter < 2 || starCounter < 2) {
 		if (moveCounter < 2) {
@@ -148,12 +201,12 @@ function updateStatsText() {
 	const msStats = `With ${moveCounter} ${moveText} and ${starCounter} ${starText}`,
 		timeStats = `Time: ${timeText}`
 	$(".moves-stars").text(msStats)
-	$(".time").text(timeStats)
+	$(".time-played").text(timeStats)
 }
 
 function addPlayAgainButtonListener($button) {
 	$button.on("click", () => {
-		startGame()
+		resetGame()
 	})
 }
 
@@ -225,7 +278,7 @@ function deleteCardsHTML() {
 
 function addRestartButtonListener($button) {
 	$button.on("click", () => {
-		startGame()
+		resetGame()
 	})
 }
 
@@ -235,6 +288,12 @@ function setIconAttr($element, attr) {
 
 function addCardListener($element) {
 	$element.on("click", function () {
+		// first click
+		if(moveCounter === 0 && openStack.length === 0) {
+			// the first click indicates a game start
+			startGame()
+		}
+
 		// open card and show the icon when clicked
 		$(this).addClass("open show")
 
@@ -374,6 +433,10 @@ function resetStarCounter() {
 	starCounter = STAR_NUMBER
 }
 
+function resetTimer() {
+	timer.reset()
+}
+
 function getNodeListFromCards(cards) {
 	let $cards = []
 	for (let card of cards) {
@@ -414,6 +477,33 @@ function checkWin() {
 
 // format ms to readable time string
 function formatMilliseconds(time) {
+	time = Math.floor(time / 1000)
+	const h = Math.floor(time / 3600)
+	time %= 3600
+	const m = Math.floor(time / 60)
+	const s = time % 60
+	let formattedTime,
+		hText = `${m}:`,
+		mText = `${m}:`,
+		sText = `${s}`
+
+	if (h < 10) {
+		hText = "0" + hText
+	}
+	if (m < 10) {
+		mText = "0" + mText
+	}
+	if (s < 10) {
+		sText = "0" + sText
+	}
+	formattedTime = hText + mText + sText
+
+	return formattedTime
+
+}
+
+// format ms to descriptive time string
+function getDescriptiveTime(time) {
 	time = Math.floor(time / 1000)
 	const h = Math.floor(time / 3600)
 	time %= 3600
