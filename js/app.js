@@ -480,7 +480,7 @@ function formatMilliseconds(time) {
 	const m = Math.floor(time / 60)
 	const s = time % 60
 	let formattedTime,
-		hText = `${m}:`,
+		hText = `${h}:`,
 		mText = `${m}:`,
 		sText = `${s}`
 
@@ -506,7 +506,7 @@ function getDescriptiveTime(time) {
 	const m = Math.floor(time / 60)
 	const s = time % 60
 	let formattedTime,
-		hText = `${m}m `,
+		hText = `${h}h `,
 		mText = `${m}m `,
 		sText = `${s}s`
 
